@@ -5,6 +5,36 @@
 
 #include "Node.h"
 
+template <class T>
+class Iterator{
+private:
+    Node<T>* iterator;
+public:
+    Iterator(){iterator = nullptr;}
+
+    Iterator(Node<T>* it){this->iterator = it;}
+
+    void operator ++ (){
+        this->iterator = this->iterator->next;
+    }
+
+    void operator -- (){
+        this->iterator = this->iterator->previous;
+    }
+
+    T& operator * (){
+        return iterator->value;
+    }
+
+    bool operator == (const Iterator &it){
+        return (iterator == it.iterator);
+    }
+
+    bool operator != (const Iterator &it){
+        return (iterator != it.iterator);
+    }
+
+};
 
 template <typename T>
 class List {
@@ -14,83 +44,247 @@ private:
 public:
     List(const List &lista){head = lista.head; tail = lista.tail;}
 
-    List(T* array){
+    List(T* array, int size) {
 
-        head->value = (array)[0];
-        tail->value = head->value;
+        Node<T>* node(array[0], nullptr);
 
-        for(int i = 1; i < sizeof(*array); i++){
-            tail->value = (array)[i];
-            tail = tail->next;
+        head = node;
+        tail = head;
+
+        for (int i = 1; i < size; i++) {
+            Node<T>* nodo = new T{array[i], nullptr};
+            tail->next = nodo;
+            tail = nodo;
         }
-
-        tail->next = nullptr;
     }
 
-   List(Node<T>*){
-        //Constructor por parametro,
-        //retorna una lista con un nodo
+    List(Node<T>* node){
+        head = node;
+        tail = node;
     }
 
-    List(int){
+    List(int n){
+
+        Node<T>* node(rand(), nullptr);
+        head = node;
+        tail = head;
+
+        for(int i = 1; i < n; i++){
+            T data = rand()+4;
+            Node<T>* node = new T{data, nullptr};
+            tail->next = node;
+            tail = node;
+        }
         //Constructor por parametro,
         //retorna un lista de randoms de tamaño n
     }
 
-    List(void){
-        //Constructor por defecto
+    List(){head = nullptr, tail = nullptr;}
+
+    ~List(){
     }
 
-    ~List(void){
+    //Retorna una referencia al primer elemento
+    T front(){
+        return head->value;
     }
-
-    // Retorna una referencia al primer elemento
-    T front(void) = 0;
 
     // Retorna una referencia al ultimo elemento
-    T back(void) = 0;
+    T back(){
+        return tail->value;
+    }
+
 
     // Inserta un elemento al final
-    void push_back(const T& element) = 0;
+    void push_back(const T& element){
+        if (head == nullptr) {
+            Node<T>* node = new Node<T> {element, nullptr};
+            head = node;
+            tail = head;
+        }
+        else {
+            Node<T>* node = new Node<T> {element, nullptr};
+            tail->next = node;
+            tail = node;
+        }
+    }
 
     // Inserta un elemento al inicio
-    void push_front(const T& element) = 0;
+    void push_front(const T& element){
+        if(head == nullptr){
+            Node<T>* node = new Node<T> {element, nullptr};
+            head = node;
+            tail = head;
+        }
+        else{
+            Node<T>* New_Head = new Node<T> {element, head};
+            head = New_Head;
+        }
+    }
 
     // Quita el ultimo elemento y retorna una referencia
-    T& pop_back(void) = 0;
+    void pop_back(){
+        Node<T>* current = head;
+        if(current != nullptr) {
+            while (current->next != tail) {
+                current = current->next;
+            }
+            delete tail;
+            current->next = nullptr;
+            tail = current;
+        }
+    }
 
     // Quita el primer elemento y retorna una referencia
-    T& pop_front(void) = 0;
+    void pop_front(){
+        Node<T>* current = head;
+        if(current != nullptr) {
+            current = current->next;
+            delete head;
+            head = current;
+        }
+    }
+
+    Iterator<T> end(){
+        return (Iterator<T> (nullptr));
+    }
 
     // Acceso aleatorio
-    T& operator[] (const int&) = 0;
+    T &operator [] (int pos){
+        int contador = 0;
+        for(Iterator<T> it(head); it != end() ; ++it){
+            if(contador == pos)
+                return *it;
+            else{
+                contador++;
+            }
+        }
+    }
 
     // la lista esta vacia?
-    bool empty(void) = 0;
+    bool empty(){
+        return head == nullptr;
+    }
 
     // retorna el tamaño de la lista
-    unsigned int size(void) = 0;
+    unsigned int size(){
+        Node<T>* current = head;
+        int contador = 0;
+
+        while(current != nullptr){
+            contador++;
+            current = current->next;
+        }
+        return contador;
+    }
 
     // Elimina toda la lista
-    void clear(void) = 0;
+    void clear(){
+        Node<T>* current = head;
+        while(current != nullptr){
+            current = current->next;
+            delete head;
+            head = current;
+        }
+        delete current;
+        delete head;
+        delete tail;
+    }
 
     // Elimina un elemento en base a un puntero
-    void erase(Node<T>*) = 0;
+    void erase(Node<T>* borrar){
+        Node<T>* current = head;
+
+        if(head->value == borrar->value) {
+            head = head->next;
+            delete current;
+        }
+
+        while(current != nullptr){
+            if(current->next != nullptr) {
+                if (current->next->value == borrar->value){
+                    current->next = current->next->next;
+                    if(current->next == nullptr)
+                        tail = current;
+                }
+            }
+            current = current->next;
+        }
+    }
 
     // Inserta un elemento  en base a un puntero
-    void insert(Node<T>*, const T&) = 0;
+    void insert(Node<T>*, const T&){
+
+    }
 
     // Elimina todos los elementos por similitud
-    void remove(const T&) = 0;
+    void remove(const T& data){
 
-    // ordena la lista
-    List& sort(void) = 0;
+        Node<T>* current = head;
+
+        if(head->value == data) {
+            head = head->next;
+            delete current;
+        }
+
+        while(current != nullptr){
+            if(current->next != nullptr) {
+                if (current->next->value == data){
+                    current->next = current->next->next;
+                    if(current->next == nullptr)
+                        tail = current;
+                }
+            }
+            current = current->next;
+        }
+    }
+
+    List& sort(){
+        Node<T>* j = head->next;
+        Node<T>* i = head;
+
+        for(i = head; i != nullptr; i = i->next ){
+            for(j = i->next; j != nullptr; j = j->next){
+                if(i->value > j->value){
+                    T temp = i->value;
+                    i->value = j->value;
+                    j->value = temp;
+                }
+            }
+        }
+    }
 
     // invierte la lista
-    List& reverse(void) = 0;
+    List& reverse(){
+        Node<T>* cabeza = head;
+        cabeza->value = head->value;
+        Node<T>* cola = head;
+        cola->value = head->value;
+        int j = 0;
+
+        for(int i = 0; i < size()/2; i++){
+            int contador = size()-1-j;
+            while(contador > 0 ){
+                cola = cola->next;
+                contador--;
+            }
+            j++;
+
+            T temp = cabeza->value;
+            cabeza->value = cola->value;
+            cola->value = temp;
+
+            cabeza = cabeza->next;
+            cola = head;
+        }
+    }
 
     // Imprime la lista con cout
-    template<typename __T>
-    inline friend std::ostream& operator<<
-            (std::ostream& , const List<__T>& );*/
+    friend std::ostream& operator << (std::ostream &os , const List &lista){
+        Node<T>* current = lista.head;
+        while(current != nullptr) {
+            os << current->value << " ";
+            current = current->next;
+        }
+    }
 };
