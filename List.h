@@ -203,10 +203,21 @@ public:
     }
 
     // Inserta un elemento  en base a un puntero
-    void insert(Node<T>* insertar, const T& pos){
-
-
+    void insert(Node<T>* insertar, const T& pos) {
+        if (pos >= size())
+            push_back(insertar->value);
+        if (pos == 0)
+            push_front(insertar->value);
+        if (pos > 0 && pos < size()) {
+            Node<T> *current = head;
+            for (int i = 0; i < pos - 1; i++) {
+                current = current->next;
+            }
+            insertar->next = current->next;
+            current->next = insertar;
+        }
     }
+
 
     // Elimina todos los elementos por similitud
     void remove(const T& data){
