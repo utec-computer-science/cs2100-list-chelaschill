@@ -46,16 +46,13 @@ public:
 
     List(T* array, int size) {
 
-        Node<T>* node(array[0], nullptr);
-
-        head = node;
+        head = nullptr;
         tail = head;
 
-        for (int i = 1; i < size; i++) {
-            Node<T>* nodo = new T{array[i], nullptr};
-            tail->next = nodo;
-            tail = nodo;
+        for (int i = 0; i < size; i++) {
+            push_back(array[i]);
         }
+        tail->next = nullptr;
     }
 
     List(Node<T>* node){
@@ -65,18 +62,11 @@ public:
 
     List(int n){
 
-        Node<T>* node(rand(), nullptr);
-        head = node;
+        head = nullptr;
         tail = head;
-
-        for(int i = 1; i < n; i++){
-            T data = rand()+4;
-            Node<T>* node = new T{data, nullptr};
-            tail->next = node;
-            tail = node;
+        for(int i = 0; i < n; i++){
+            push_back(rand());
         }
-        //Constructor por parametro,
-        //retorna un lista de randoms de tamaño n
     }
 
     List(){head = nullptr, tail = nullptr;}
@@ -213,7 +203,8 @@ public:
     }
 
     // Inserta un elemento  en base a un puntero
-    void insert(Node<T>*, const T&){
+    void insert(Node<T>* insertar, const T& pos){
+
 
     }
 
